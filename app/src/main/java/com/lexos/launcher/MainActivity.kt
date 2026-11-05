@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity() {
         allApps = AppRepository.loadAll(this)
         val favorites = AppRepository.userFavorites(this, allApps).ifEmpty { allApps.take(3) }
 
-        // Page d'accueil = toutes les apps
-        setupPager(allApps, favorites)
+        // Page d'accueil = seulement les apps choisies (ou les apps de base si rien de choisi)
+        setupPager(homeApps(), favorites)
         setupDrawer(allApps)
         setupDock()
         setupSwipeDown()
@@ -249,20 +249,27 @@ class MainActivity : AppCompatActivity() {
 
     // Appui long sur une app = ajouter / retirer des favoris ou du dock
     private fun showFavoriteDialog(app: AppInfo) {
+        val onHome = LexTheme.isOnHome(this, app.packageName)
         val isFav = LexTheme.isFavorite(this, app.packageName)
         val inDock = LexTheme.isInDock(this, app.packageName)
-        val favAction = if (isFav) "Retirer des favoris" else "Ajouter aux favoris"
-        val dockAction = if (inDock) "Retirer du dock" else "Ajouter au dock"
+        val homeAction = if (onHome) "🏠 Retirer de l'accueil" else "🏠 Ajouter à l'accueil"
+        val favAction = if (isFav) "⭐ Retirer des favoris" else "⭐ Ajouter aux favoris"
+        val dockAction = if (inDock) "⬇ Retirer du dock" else "⬇ Ajouter au dock"
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.LexDialog)
             .setTitle(app.label)
-            .setItems(arrayOf(favAction, dockAction, "Annuler")) { _, which ->
+            .setItems(arrayOf(homeAction, favAction, dockAction, "Annuler")) { _, which ->
                 when (which) {
                     0 -> {
+                        if (onHome) LexTheme.removeHome(this, app.packageName)
+                        else LexTheme.addHome(this, app.packageName)
+                        refreshFavorites()
+                    }
+                    1 -> {
                         if (isFav) LexTheme.removeFavorite(this, app.packageName)
                         else LexTheme.addFavorite(this, app.packageName)
                         refreshFavorites()
                     }
-                    1 -> {
+                    2 -> {
                         if (inDock) LexTheme.removeDock(this, app.packageName)
                         else LexTheme.addDock(this, app.packageName)
                         setupDock()
@@ -272,9 +279,17 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    // Apps a montrer sur l'accueil : celles choisies par l'utilisateur,
+    // sinon les apps de base (telephone, messages, photo...) pour ne pas etre vide.
+    private fun homeApps(): List<AppInfo> {
+        val byPkg = allApps.associateBy { it.packageName }
+        val chosen = LexTheme.homePackages(this).mapNotNull { byPkg[it] }
+        return chosen.ifEmpty { AppRepository.officialApps(this).ifEmpty { allApps.take(8) } }
+    }
+
     private fun refreshFavorites() {
         val favorites = AppRepository.userFavorites(this, allApps).ifEmpty { allApps.take(3) }
-        setupPager(allApps, favorites)
+        setupPager(homeApps(), favorites)
     }
 
     private fun setupDrawer(all: List<AppInfo>) {

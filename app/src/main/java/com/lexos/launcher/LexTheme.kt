@@ -136,6 +136,28 @@ object LexTheme {
         prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
     }
 
+    // Apps affichees sur l'ecran d'accueil (choisies par l'utilisateur)
+    private const val K_HOME = "home_apps"
+
+    fun homePackages(ctx: Context): List<String> {
+        val raw = prefs(ctx).getString(K_HOME, "") ?: ""
+        return raw.split(",").filter { it.isNotBlank() }
+    }
+
+    fun isOnHome(ctx: Context, pkg: String): Boolean = homePackages(ctx).contains(pkg)
+
+    fun addHome(ctx: Context, pkg: String) {
+        val list = homePackages(ctx).toMutableList()
+        if (!list.contains(pkg)) list.add(pkg)
+        prefs(ctx).edit().putString(K_HOME, list.joinToString(",")).apply()
+    }
+
+    fun removeHome(ctx: Context, pkg: String) {
+        val list = homePackages(ctx).toMutableList()
+        list.remove(pkg)
+        prefs(ctx).edit().putString(K_HOME, list.joinToString(",")).apply()
+    }
+
     // Apps du dock choisies par l'utilisateur
     private const val K_DOCK = "dock_apps"
 
