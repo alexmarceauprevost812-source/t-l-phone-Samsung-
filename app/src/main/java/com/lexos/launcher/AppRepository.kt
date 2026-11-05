@@ -72,14 +72,14 @@ object AppRepository {
     // Resout un role de la barre d'accueil (telephone, camera...) vers une vraie app.
     fun resolveDock(context: Context, role: String): AppInfo? {
         val pm = context.packageManager
-        val intent: Intent? = when (role) {
+        val intent: Intent = when (role) {
             "dialer" -> Intent(Intent.ACTION_DIAL)
             "sms" -> Intent(Intent.ACTION_MAIN).apply { addCategory("android.intent.category.APP_MESSAGING") }
             "camera" -> Intent("android.media.action.STILL_IMAGE_CAMERA")
             "browser" -> Intent(Intent.ACTION_MAIN).apply { addCategory("android.intent.category.APP_BROWSER") }
             "settings" -> Intent(android.provider.Settings.ACTION_SETTINGS)
-            else -> null
-        } ?: return null
+            else -> return null
+        }
 
         val ri = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) ?: return null
         val ai = ri.activityInfo ?: return null
