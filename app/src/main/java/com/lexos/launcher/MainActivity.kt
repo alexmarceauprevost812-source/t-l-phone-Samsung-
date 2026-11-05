@@ -74,16 +74,96 @@ class MainActivity : AppCompatActivity() {
         findViewById<RecyclerView>(R.id.appsGrid).adapter?.notifyDataSetChanged()
         handler.post(clockTick)
         updateHomeWeather()
+        updateNotifRow()
+        // Se rafraichir quand une notification arrive/part
+        LexNotifService.listener = { handler.post { updateNotifRow() } }
     }
 
     override fun onPause() {
         super.onPause()
         handler.removeCallbacks(clockTick)
+        LexNotifService.listener = null
     }
 
     private fun updateClock() {
         clock.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         dateView.text = SimpleDateFormat("EEEE d MMMM", Locale.getDefault()).format(Date())
+    }
+
+    // Rangee des notifications sur l'accueil : icones des apps qui en ont.
+    // Tap = ouvre le panneau de notifications Android.
+    private fun updateNotifRow() {
+        val row = findViewById<LinearLayout>(R.id.notifRow)
+        row.removeAllViews()
+
+        val enabled = androidx.core.app.NotificationManagerCompat
+            .getEnabledListenerPackages(this).contains(packageName)
+
+        if (!enabled) {
+            // Pas encore autorise : petit bouton pour activer
+            val tv = TextView(this)
+            tv.text = "🔔 activer"
+            tv.textSize = 12f
+            tv.setTextColor(LexTheme.accent(this))
+            tv.typeface = LexTheme.typeface(this)
+            row.addView(tv)
+            row.setOnClickListener {
+                try {
+                    val i = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                    startActivity(i)
+                } catch (_: Exception) {}
+            }
+            return
+        }
+
+        val pkgs = LexNotifService.packages
+        if (pkgs.isEmpty()) {
+            val tv = TextView(this)
+            tv.text = "🔔 0"
+            tv.textSize = 12f
+            tv.setTextColor(LexTheme.textColor(this))
+            tv.typeface = LexTheme.typeface(this)
+            row.addView(tv)
+        } else {
+            val byPkg = allApps.associateBy { it.packageName }
+            for (pkg in pkgs.take(5)) {
+                val iv = ImageView(this)
+                val size = dp(26)
+                val lp = LinearLayout.LayoutParams(size, size)
+                lp.marginEnd = dp(6)
+                iv.layoutParams = lp
+                val icon = byPkg[pkg]?.icon ?: try { packageManager.getApplicationIcon(pkg) } catch (_: Exception) { null }
+                iv.setImageDrawable(icon)
+                row.addView(iv)
+            }
+            if (LexNotifService.count > 0) {
+                val tv = TextView(this)
+                tv.text = "${LexNotifService.count}"
+                tv.textSize = 12f
+                tv.setTextColor(LexTheme.accent(this))
+                tv.typeface = LexTheme.typeface(this)
+                row.addView(tv)
+            }
+        }
+
+        // Tap = ouvrir le panneau de notifications du telephone
+        row.setOnClickListener { openNotificationPanel() }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun openNotificationPanel() {
+        try {
+            // Methode standard (fonctionne sur la plupart des Samsung)
+            val sbs = getSystemService("statusbar")
+            val cls = Class.forName("android.app.StatusBarManager")
+            val m = cls.getMethod("expandNotificationsPanel")
+            m.invoke(sbs)
+        } catch (e: Exception) {
+            // Secours : ouvrir les reglages de notifications
+            try {
+                startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            } catch (_: Exception) {}
+        }
     }
 
     private var lastWeatherFetch = 0L
