@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         refreshFavorites()
         findViewById<RecyclerView>(R.id.appsGrid).adapter?.notifyDataSetChanged()
         handler.post(clockTick)
+        updateHomeWeather()
     }
 
     override fun onPause() {
@@ -83,6 +84,20 @@ class MainActivity : AppCompatActivity() {
     private fun updateClock() {
         clock.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         dateView.text = SimpleDateFormat("EEEE d MMMM", Locale.getDefault()).format(Date())
+    }
+
+    private var lastWeatherFetch = 0L
+
+    // Meteo sur l'accueil, rafraichie au plus toutes les 15 min
+    private fun updateHomeWeather() {
+        val now = System.currentTimeMillis()
+        if (now - lastWeatherFetch < 15 * 60 * 1000) return
+        lastWeatherFetch = now
+        val tv = findViewById<TextView>(R.id.homeWeather)
+        WeatherFetcher.fetch(null, null) { txt ->
+            tv.text = txt
+            tv.typeface = LexTheme.typeface(this)
+        }
     }
 
     private fun applyBackground() {

@@ -23,12 +23,27 @@ object WeatherFetcher {
                 val cur = JSONObject(json).getJSONObject("current")
                 val temp = cur.getDouble("temperature_2m").toInt()
                 val code = cur.getInt("weather_code")
-                "${temp}°  ${label(code)}"
+                "${emoji(code)} ${temp}°  ${label(code)}"
             } catch (e: Exception) {
                 ""
             }
             Handler(Looper.getMainLooper()).post { onResult(text) }
         }
+    }
+
+    // Code meteo WMO -> emoji
+    private fun emoji(code: Int): String = when (code) {
+        0 -> "☀️"
+        1, 2 -> "🌤️"
+        3 -> "☁️"
+        45, 48 -> "🌫️"
+        in 51..57 -> "🌦️"
+        in 61..67 -> "🌧️"
+        in 71..77 -> "❄️"
+        in 80..82 -> "🌧️"
+        in 85..86 -> "🌨️"
+        in 95..99 -> "⛈️"
+        else -> "🌡️"
     }
 
     // Code meteo WMO -> petit texte
