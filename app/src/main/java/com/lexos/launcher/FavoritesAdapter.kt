@@ -28,6 +28,9 @@ class FavoritesAdapter(
         val app = items[position]
         holder.icon.setImageDrawable(app.icon)
         holder.name.text = app.label
+        holder.name.typeface = LexTheme.typeface(holder.itemView.context)
+        holder.name.setTextColor(LexTheme.textColor(holder.itemView.context))
+        holder.open.typeface = LexTheme.typeface(holder.itemView.context)
         holder.open.setOnClickListener { onOpen(app, holder.icon) }
         holder.icon.setOnClickListener { onOpen(app, holder.icon) }
     }

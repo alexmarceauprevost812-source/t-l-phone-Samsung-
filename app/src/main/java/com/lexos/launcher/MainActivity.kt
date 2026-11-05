@@ -69,6 +69,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         applyBackground()
         applyFontAndColors()
+        // Redessine les grilles pour appliquer police/couleur aux noms d'apps
+        refreshFavorites()
+        findViewById<RecyclerView>(R.id.appsGrid).adapter?.notifyDataSetChanged()
         handler.post(clockTick)
     }
 
@@ -225,8 +228,8 @@ class MainActivity : AppCompatActivity() {
     // Remonte le dock au-dessus de la barre de navigation, et descend l'en-tete
     // sous la barre d'etat, pour que rien ne soit coupe.
     private fun setupInsets() {
-        val dock = findViewById<LinearLayout>(R.id.dock)
-        ViewCompat.setOnApplyWindowInsetsListener(dock) { v, insets ->
+        val dockScroll = findViewById<View>(R.id.dockScroll)
+        ViewCompat.setOnApplyWindowInsetsListener(dockScroll) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(v.paddingLeft, dp(14), v.paddingRight, dp(18) + bars.bottom)
             insets

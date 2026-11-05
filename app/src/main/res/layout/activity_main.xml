@@ -63,18 +63,25 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Barre d'accueil fixe -->
-        <LinearLayout
-            android:id="@+id/dock"
+        <!-- Barre d'accueil defilante (gauche-droite) -->
+        <HorizontalScrollView
+            android:id="@+id/dockScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#80000000"
-            android:orientation="horizontal"
+            android:scrollbars="none"
             android:paddingTop="14dp"
             android:paddingBottom="30dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:gravity="center" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <LinearLayout
+                android:id="@+id/dock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center" />
+        </HorizontalScrollView>
     </LinearLayout>
 
     <!-- Tiroir : toutes les apps -->
