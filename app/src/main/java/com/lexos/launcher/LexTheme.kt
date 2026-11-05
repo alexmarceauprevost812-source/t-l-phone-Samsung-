@@ -136,7 +136,7 @@ object LexTheme {
         prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
     }
 
-    // App lancee par le geste "glisser vers la gauche" (raccourci rapide)
+    // Une seule app rapide, lancee par "glisser vers la gauche"
     private const val K_LEFTAPP = "left_app"
 
     fun leftApp(ctx: Context): String? = prefs(ctx).getString(K_LEFTAPP, null)

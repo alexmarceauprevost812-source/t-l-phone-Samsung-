@@ -340,7 +340,8 @@ class MainActivity : AppCompatActivity() {
         val homeAction = if (onHome) "🏠 Retirer de l'accueil" else "🏠 Ajouter à l'accueil"
         val favAction = if (isFav) "⭐ Retirer des favoris" else "⭐ Ajouter aux favoris"
         val dockAction = if (inDock) "⬇ Retirer du dock" else "⬇ Ajouter au dock"
-        val leftAction = "← Raccourci geste gauche"
+        val isLeft = LexTheme.leftApp(this) == app.packageName
+        val leftAction = if (isLeft) "⚡ Retirer de l'app rapide (←)" else "⚡ App rapide (glisse ←)"
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.LexDialog)
             .setTitle(app.label)
             .setItems(arrayOf(homeAction, favAction, dockAction, leftAction, "Annuler")) { _, which ->
@@ -361,9 +362,10 @@ class MainActivity : AppCompatActivity() {
                         setupDock()
                     }
                     3 -> {
-                        LexTheme.setLeftApp(this, app.packageName)
-                        android.widget.Toast.makeText(this,
-                            "${app.label} → glisse vers la gauche", android.widget.Toast.LENGTH_SHORT).show()
+                        LexTheme.setLeftApp(this, if (isLeft) null else app.packageName)
+                        val msg = if (isLeft) "App rapide retirée"
+                            else "${app.label} → glisse vers la gauche"
+                        android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -444,7 +446,7 @@ class MainActivity : AppCompatActivity() {
                     sheet.state = BottomSheetBehavior.STATE_EXPANDED
                     return true
                 }
-                // Glisser vers la gauche = app rapide (appareil photo par defaut)
+                // Glisser vers la gauche = lancer l'app rapide choisie
                 if (dx < -120 && kotlin.math.abs(dx) > kotlin.math.abs(dy)) {
                     launchLeftApp()
                     return true
@@ -483,18 +485,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
-    // Lance l'app du geste gauche : celle choisie, sinon l'appareil photo.
+    // Lance l'app rapide du geste gauche : celle choisie, sinon l'appareil photo.
     private fun launchLeftApp() {
         val chosen = LexTheme.leftApp(this)
-        if (chosen != null) {
-            AppRepository.launch(this, chosen)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            return
-        }
-        // Defaut : appareil photo
-        val cam = AppRepository.resolveDock(this, "camera")
-        if (cam != null) {
-            AppRepository.launch(this, cam.packageName)
+        val pkg = chosen ?: AppRepository.resolveDock(this, "camera")?.packageName
+        if (pkg != null) {
+            AppRepository.launch(this, pkg)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
