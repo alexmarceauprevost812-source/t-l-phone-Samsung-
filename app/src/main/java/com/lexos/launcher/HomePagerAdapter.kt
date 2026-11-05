@@ -1,8 +1,12 @@
 package com.lexos.launcher
 
+import android.content.Intent
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -36,8 +40,35 @@ class HomePagerAdapter(
             grid.layoutManager = GridLayoutManager(holder.itemView.context, 4)
             grid.adapter = AppsAdapter(official, { app, icon -> onOpen(app, icon) }, onLongClick)
         } else {
+            val ctx = holder.itemView.context
             val fav = holder.itemView.findViewById<ViewPager2>(R.id.favPager)
             fav.adapter = FavoritesAdapter(favorites) { app, icon -> onOpen(app, icon) }
+
+            // Meteo (coordonnees par defaut, pas besoin de permission)
+            val weather = holder.itemView.findViewById<TextView>(R.id.weatherText)
+            WeatherFetcher.fetch(null, null) { txt ->
+                weather.text = if (txt.isBlank()) "indisponible" else txt
+            }
+
+            // Notifications
+            val notif = holder.itemView.findViewById<TextView>(R.id.notifText)
+            val enabled = NotificationManagerCompat.getEnabledListenerPackages(ctx)
+                .contains(ctx.packageName)
+            if (!enabled) {
+                notif.text = "Activer ▸"
+                notif.setOnClickListener {
+                    try {
+                        val i = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        ctx.startActivity(i)
+                    } catch (_: Exception) {}
+                }
+            } else {
+                val r = LexNotifService.recent
+                notif.setOnClickListener(null)
+                notif.text = if (r.isEmpty()) "Aucune"
+                    else "${LexNotifService.count} • " + r.takeLast(2).joinToString(" · ")
+            }
         }
     }
 }
