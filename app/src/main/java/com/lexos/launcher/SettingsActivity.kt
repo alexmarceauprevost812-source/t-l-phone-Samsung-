@@ -124,9 +124,10 @@ class SettingsActivity : AppCompatActivity() {
             tv.setPadding(dp(14), dp(12), dp(14), dp(12))
             tv.typeface = when (key) {
                 "mono" -> android.graphics.Typeface.MONOSPACE
-                "rond" -> android.graphics.Typeface.create("sans-serif-rounded", android.graphics.Typeface.NORMAL)
-                "techno" -> android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.BOLD)
-                else -> android.graphics.Typeface.DEFAULT
+                "serif" -> android.graphics.Typeface.SERIF
+                "gras" -> android.graphics.Typeface.DEFAULT_BOLD
+                "light" -> android.graphics.Typeface.create("sans-serif-light", android.graphics.Typeface.NORMAL)
+                else -> android.graphics.Typeface.SANS_SERIF
             }
             val lp = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

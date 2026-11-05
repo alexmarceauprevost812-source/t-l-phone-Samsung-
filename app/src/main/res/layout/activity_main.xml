@@ -21,15 +21,50 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- HAUT (~30% hauteur) : horloge, date, onglets. Zone pour glisser. -->
+        <!-- Barre d'onglets fine, TOUJOURS visible : Rapide / Accueil / Favoris -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal"
+            android:background="@drawable/pill_bg"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/tabHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="Accueil"
+                android:textColor="@color/lexos_black"
+                android:textSize="12sp"
+                android:background="@drawable/logo_circle" />
+
+            <TextView
+                android:id="@+id/tabFav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="Favoris →"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- HAUT (horloge, date) : visible seulement sur Accueil. Zone pour glisser. -->
         <LinearLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="30"
             android:orientation="vertical"
-            android:gravity="center"
-            android:paddingTop="24dp">
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/clock"
@@ -51,45 +86,11 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/lexos_orange"
                 android:textSize="13sp" />
-
-            <!-- Onglets Accueil / Favoris -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                android:background="@drawable/pill_bg"
-                android:padding="4dp">
-
-                <TextView
-                    android:id="@+id/tabHome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="18dp"
-                    android:paddingEnd="18dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:text="Accueil"
-                    android:textColor="@color/lexos_black"
-                    android:textSize="12sp"
-                    android:background="@drawable/logo_circle" />
-
-                <TextView
-                    android:id="@+id/tabFav"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="18dp"
-                    android:paddingEnd="18dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:text="Favoris →"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-            </LinearLayout>
         </LinearLayout>
 
-        <!-- MILIEU (~30% hauteur) : meteo a GAUCHE 50% + notifications a DROITE 50% -->
+        <!-- MILIEU : meteo GAUCHE + notifications DROITE. Visible seulement sur Accueil. -->
         <LinearLayout
+            android:id="@+id/middleBlock"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="30"

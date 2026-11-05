@@ -89,9 +89,9 @@ object LexTheme {
         prefs(ctx).edit().putInt(K_DIM, value.coerceIn(0, 80)).apply()
     }
 
-    // Police d'ecriture
-    val FONT_CHOICES = listOf("normal", "mono", "rond", "techno")
-    val FONT_LABELS = listOf("Normale", "Monospace", "Arrondie", "Techno")
+    // Police d'ecriture (polices garanties differentes sur tous les telephones)
+    val FONT_CHOICES = listOf("normal", "mono", "serif", "gras", "light")
+    val FONT_LABELS = listOf("Normale", "Monospace", "Serif", "Gras", "Fine")
 
     fun fontKey(ctx: Context): String = prefs(ctx).getString(K_FONT, "normal") ?: "normal"
 
@@ -101,9 +101,10 @@ object LexTheme {
 
     fun typeface(ctx: Context): Typeface = when (fontKey(ctx)) {
         "mono" -> Typeface.MONOSPACE
-        "rond" -> Typeface.create("sans-serif-rounded", Typeface.NORMAL)
-        "techno" -> Typeface.create("sans-serif-condensed", Typeface.BOLD)
-        else -> Typeface.DEFAULT
+        "serif" -> Typeface.SERIF
+        "gras" -> Typeface.DEFAULT_BOLD
+        "light" -> Typeface.create("sans-serif-light", Typeface.NORMAL)
+        else -> Typeface.SANS_SERIF
     }
 
     // Effet Matrix en fond
@@ -145,7 +146,7 @@ object LexTheme {
         prefs(ctx).edit().putString(K_CLOCK, style).apply()
     }
 
-    // Une seule app rapide, lancee par "glisser vers la gauche"
+    // UNE app rapide lancee par "glisser vers la gauche"
     private const val K_LEFTAPP = "left_app"
 
     fun leftApp(ctx: Context): String? = prefs(ctx).getString(K_LEFTAPP, null)
@@ -154,6 +155,11 @@ object LexTheme {
         val e = prefs(ctx).edit()
         if (pkg == null) e.remove(K_LEFTAPP) else e.putString(K_LEFTAPP, pkg)
         e.apply()
+    }
+
+    // Sauvegarde l'ordre des apps de l'accueil (apres deplacement)
+    fun setHomeOrder(ctx: Context, pkgs: List<String>) {
+        prefs(ctx).edit().putString(K_HOME, pkgs.joinToString(",")).apply()
     }
 
     // Apps affichees sur l'ecran d'accueil (choisies par l'utilisateur)

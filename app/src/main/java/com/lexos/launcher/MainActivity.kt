@@ -319,6 +319,9 @@ class MainActivity : AppCompatActivity() {
         clock.typeface = tf
         dateView.typeface = tf
         clock.setTextColor(LexTheme.textColor(this))
+        findViewById<TextView>(R.id.homeWeather)?.typeface = tf
+        findViewById<TextView>(R.id.tabHome)?.typeface = tf
+        findViewById<TextView>(R.id.tabFav)?.typeface = tf
     }
 
     private fun setupPager(homeApps: List<AppInfo>, favorites: List<AppInfo>) {
@@ -327,18 +330,20 @@ class MainActivity : AppCompatActivity() {
         pager.adapter = HomePagerAdapter(
             homeApps, favorites,
             onOpen = { app, icon -> LaunchAnim.openWithAnimation(this, icon, app.packageName) },
-            onLongClick = { app -> showFavoriteDialog(app) }
+            onLongClick = { app -> showFavoriteDialog(app) },
+            onHomeReordered = { ordered -> LexTheme.setHomeOrder(this, ordered.map { it.packageName }) }
         )
         pager.setCurrentItem(current, false)
 
-        // Onglets Accueil / Favoris : tap pour changer de page (en plus du glissement)
         val tabHome = findViewById<TextView>(R.id.tabHome)
         val tabFav = findViewById<TextView>(R.id.tabFav)
         tabHome.setOnClickListener { pager.setCurrentItem(0, true) }
         tabFav.setOnClickListener { pager.setCurrentItem(1, true) }
 
+        val header = findViewById<View>(R.id.header)
+        val middle = findViewById<View>(R.id.middleBlock)
+
         fun paintTabs(pos: Int) {
-            val on = LexTheme.accent(this)
             if (pos == 0) {
                 tabHome.setBackgroundResource(R.drawable.logo_circle)
                 tabHome.setTextColor(Color.parseColor("#0A0A0A"))
@@ -352,6 +357,10 @@ class MainActivity : AppCompatActivity() {
             }
             tabHome.typeface = LexTheme.typeface(this)
             tabFav.typeface = LexTheme.typeface(this)
+            // Favoris = plein ecran : on cache l'horloge et la meteo
+            val accueil = pos == 0
+            header.visibility = if (accueil) View.VISIBLE else View.GONE
+            middle.visibility = if (accueil) View.VISIBLE else View.GONE
         }
         paintTabs(current)
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
