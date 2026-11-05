@@ -204,6 +204,18 @@
         </FrameLayout>
 
         <TextView
+            android:id="@+id/lblSamsung"
+            style="@style/SettingLabel"
+            android:text="TÉLÉPHONE" />
+
+        <TextView
+            android:id="@+id/btnSamsungSettings"
+            style="@style/ModeButton"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:text="⚙️ Tous les paramètres Samsung" />
+
+        <TextView
             android:id="@+id/btnReset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

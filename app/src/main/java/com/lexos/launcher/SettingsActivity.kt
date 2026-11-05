@@ -149,6 +149,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupReset() {
+        // Raccourci vers tous les parametres Samsung / Android
+        findViewById<TextView>(R.id.btnSamsungSettings).setOnClickListener {
+            try {
+                startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
+            } catch (_: Exception) {}
+        }
         findViewById<TextView>(R.id.btnReset).setOnClickListener {
             LexTheme.applyModeDefaults(this, true)
             LexTheme.setAccent(this, LexTheme.DEFAULT_ACCENT)

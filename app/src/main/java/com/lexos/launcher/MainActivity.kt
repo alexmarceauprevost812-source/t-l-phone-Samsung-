@@ -150,19 +150,104 @@ class MainActivity : AppCompatActivity() {
         row.setOnClickListener { openNotificationPanel() }
     }
 
-    @Suppress("DEPRECATION")
+    // ----- Panneau de notifications LexOS (glisse depuis le haut) -----
+
+    private var notifOpen = false
+
     private fun openNotificationPanel() {
-        try {
-            // Methode standard (fonctionne sur la plupart des Samsung)
-            val sbs = getSystemService("statusbar")
-            val cls = Class.forName("android.app.StatusBarManager")
-            val m = cls.getMethod("expandNotificationsPanel")
-            m.invoke(sbs)
-        } catch (e: Exception) {
-            // Secours : ouvrir les reglages de notifications
-            try {
-                startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-            } catch (_: Exception) {}
+        val panel = findViewById<View>(R.id.notifPanel)
+        val sheet = findViewById<View>(R.id.notifSheet)
+        fillNotifList()
+
+        panel.alpha = 0f
+        panel.visibility = View.VISIBLE
+        panel.animate().alpha(1f).setDuration(180).start()
+
+        sheet.translationY = -sheet.height.toFloat().coerceAtLeast(600f)
+        sheet.animate()
+            .translationY(0f)
+            .setDuration(320)
+            .setInterpolator(android.view.animation.DecelerateInterpolator(2f))
+            .start()
+        notifOpen = true
+
+        // Tap sur le fond sombre = fermer
+        panel.setOnClickListener { closeNotificationPanel() }
+        sheet.setOnClickListener { /* bloque le tap pour ne pas fermer */ }
+        findViewById<TextView>(R.id.notifClearAll).setOnClickListener {
+            for (n in LexNotifService.items) notifService?.dismiss(n.key)
+            handler.postDelayed({ fillNotifList() }, 200)
+        }
+    }
+
+    private fun closeNotificationPanel() {
+        if (!notifOpen) return
+        val panel = findViewById<View>(R.id.notifPanel)
+        val sheet = findViewById<View>(R.id.notifSheet)
+        sheet.animate()
+            .translationY(-sheet.height.toFloat())
+            .setDuration(260)
+            .setInterpolator(android.view.animation.AccelerateInterpolator(1.5f))
+            .start()
+        panel.animate().alpha(0f).setDuration(260)
+            .withEndAction { panel.visibility = View.GONE }
+            .start()
+        notifOpen = false
+    }
+
+    private val notifService: LexNotifService?
+        get() = LexNotifService.instance
+
+    private fun fillNotifList() {
+        val list = findViewById<LinearLayout>(R.id.notifList)
+        list.removeAllViews()
+        findViewById<TextView>(R.id.notifPanelTitle).typeface = LexTheme.typeface(this)
+
+        val items = LexNotifService.items
+        if (items.isEmpty()) {
+            val tv = TextView(this)
+            tv.text = "Aucune notification"
+            tv.setTextColor(Color.parseColor("#888888"))
+            tv.textSize = 14f
+            tv.typeface = LexTheme.typeface(this)
+            tv.setPadding(dp(8), dp(20), dp(8), dp(20))
+            list.addView(tv)
+            return
+        }
+
+        val byPkg = allApps.associateBy { it.packageName }
+        for (n in items) {
+            val row = LayoutInflater.from(this).inflate(R.layout.item_notif, list, false)
+            val icon = row.findViewById<ImageView>(R.id.nIcon)
+            val app = row.findViewById<TextView>(R.id.nApp)
+            val title = row.findViewById<TextView>(R.id.nTitle)
+            val text = row.findViewById<TextView>(R.id.nText)
+
+            val info = byPkg[n.pkg]
+            icon.setImageDrawable(info?.icon ?: try { packageManager.getApplicationIcon(n.pkg) } catch (_: Exception) { null })
+            app.text = info?.label ?: n.pkg
+            title.text = n.title
+            text.text = n.text
+            text.visibility = if (n.text.isBlank()) View.GONE else View.VISIBLE
+
+            val tf = LexTheme.typeface(this)
+            app.typeface = tf; title.typeface = tf; text.typeface = tf
+            app.setTextColor(LexTheme.accent(this))
+
+            // Tap = ouvrir l'app ; glisser = effacer
+            row.setOnClickListener {
+                closeNotificationPanel()
+                AppRepository.launch(this, n.pkg)
+            }
+            row.setOnLongClickListener {
+                row.animate().translationX(row.width.toFloat()).alpha(0f).setDuration(220)
+                    .withEndAction {
+                        notifService?.dismiss(n.key)
+                        list.removeView(row)
+                    }.start()
+                true
+            }
+            list.addView(row)
         }
     }
 
@@ -395,6 +480,7 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
+        if (notifOpen) { closeNotificationPanel(); return }
         if (::sheet.isInitialized && sheet.state != BottomSheetBehavior.STATE_HIDDEN) {
             sheet.state = BottomSheetBehavior.STATE_HIDDEN
         }
