@@ -2,6 +2,7 @@ package com.lexos.launcher
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 
 // Gere tous les reglages visuels de LexOS, sauvegardes sur le telephone.
 object LexTheme {
@@ -15,6 +16,8 @@ object LexTheme {
     private const val K_BG = "bg"               // couleur de fond principale
     private const val K_WALL = "wallpaper"      // URI de la photo de fond (ou null)
     private const val K_DIM = "dim"             // voile sombre sur la photo (0-80)
+    private const val K_FONT = "font"           // police : normal, mono, rond, techno
+    private const val K_MATRIX = "matrix"       // effet matrix active (true/false)
 
     // Valeurs par defaut (theme soir LexOS)
     const val DEFAULT_ACCENT = "#FF6A00"
@@ -84,6 +87,30 @@ object LexTheme {
 
     fun setDim(ctx: Context, value: Int) {
         prefs(ctx).edit().putInt(K_DIM, value.coerceIn(0, 80)).apply()
+    }
+
+    // Police d'ecriture
+    val FONT_CHOICES = listOf("normal", "mono", "rond", "techno")
+    val FONT_LABELS = listOf("Normale", "Monospace", "Arrondie", "Techno")
+
+    fun fontKey(ctx: Context): String = prefs(ctx).getString(K_FONT, "normal") ?: "normal"
+
+    fun setFont(ctx: Context, key: String) {
+        prefs(ctx).edit().putString(K_FONT, key).apply()
+    }
+
+    fun typeface(ctx: Context): Typeface = when (fontKey(ctx)) {
+        "mono" -> Typeface.MONOSPACE
+        "rond" -> Typeface.create("sans-serif-rounded", Typeface.NORMAL)
+        "techno" -> Typeface.create("sans-serif-condensed", Typeface.BOLD)
+        else -> Typeface.DEFAULT
+    }
+
+    // Effet Matrix en fond
+    fun matrixOn(ctx: Context): Boolean = prefs(ctx).getBoolean(K_MATRIX, true)
+
+    fun setMatrix(ctx: Context, on: Boolean) {
+        prefs(ctx).edit().putBoolean(K_MATRIX, on).apply()
     }
 
     // Remet le mode jour ou soir avec ses couleurs par defaut (efface les choix manuels)

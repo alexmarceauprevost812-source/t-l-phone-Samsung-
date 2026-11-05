@@ -6,65 +6,62 @@
     android:layout_height="match_parent"
     android:background="@drawable/lexos_background">
 
+    <com.lexos.launcher.MatrixView
+        android:id="@+id/matrix"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- En-tete LexOS -->
+        <!-- Horloge en haut -->
         <TextView
-            android:id="@+id/brand"
+            android:id="@+id/clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="48dp"
-            android:text="LexOS"
+            android:layout_marginTop="40dp"
+            android:text="00:00"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:letterSpacing="0.15"
-            android:textStyle="bold" />
+            android:textSize="44sp" />
 
         <TextView
+            android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="2dp"
-            android:text="ti-univers mobile"
             android:textColor="@color/lexos_orange"
             android:textSize="12sp" />
 
-        <!-- Carrousel des favoris : glisser gauche-droite -->
+        <!-- 2 pages : accueil (apps officielles) + favoris gros plan -->
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/favPager"
+            android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
-
-        <!-- Indicateur de page -->
-        <LinearLayout
-            android:id="@+id/dots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="18dp"
-            android:orientation="horizontal" />
 
         <!-- Barre d'accueil fixe -->
         <LinearLayout
             android:id="@+id/dock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#66000000"
+            android:background="#80000000"
             android:orientation="horizontal"
             android:paddingTop="14dp"
             android:paddingBottom="30dp"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:gravity="center"
-            android:weightSum="5" />
+            android:gravity="center" />
     </LinearLayout>
 
-    <!-- Tiroir : toutes les apps, monte du bas -->
+    <!-- Tiroir : toutes les apps -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/drawer"
         android:layout_width="match_parent"
@@ -96,7 +93,6 @@
                 android:text="TOUTES LES APPS"
                 android:textColor="@color/lexos_grey_dim"
                 android:textSize="11sp"
-                android:letterSpacing="0.1"
                 android:layout_marginBottom="12dp" />
 
             <androidx.recyclerview.widget.RecyclerView

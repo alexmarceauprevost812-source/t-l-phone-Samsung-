@@ -58,6 +58,8 @@ class SettingsActivity : AppCompatActivity() {
             LexTheme.setBgColor(this, hex); refreshPreview()
         }
         setupWallpaper()
+        setupFontRow()
+        setupMatrix()
         setupReset()
 
         refreshPreview()
@@ -110,6 +112,42 @@ class SettingsActivity : AppCompatActivity() {
         })
     }
 
+    private fun setupFontRow() {
+        val row = findViewById<LinearLayout>(R.id.fontRow)
+        row.removeAllViews()
+        for (i in LexTheme.FONT_CHOICES.indices) {
+            val key = LexTheme.FONT_CHOICES[i]
+            val tv = TextView(this)
+            tv.text = LexTheme.FONT_LABELS[i]
+            tv.textSize = 16f
+            tv.setPadding(dp(14), dp(12), dp(14), dp(12))
+            tv.typeface = when (key) {
+                "mono" -> android.graphics.Typeface.MONOSPACE
+                "rond" -> android.graphics.Typeface.create("sans-serif-rounded", android.graphics.Typeface.NORMAL)
+                "techno" -> android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.BOLD)
+                else -> android.graphics.Typeface.DEFAULT
+            }
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.bottomMargin = dp(8)
+            tv.layoutParams = lp
+            tv.setBackgroundResource(R.drawable.tile_app)
+            tv.setOnClickListener { LexTheme.setFont(this, key); refreshPreview() }
+            row.addView(tv)
+        }
+    }
+
+    private fun setupMatrix() {
+        findViewById<TextView>(R.id.btnMatrixOn).setOnClickListener {
+            LexTheme.setMatrix(this, true); refreshPreview()
+        }
+        findViewById<TextView>(R.id.btnMatrixOff).setOnClickListener {
+            LexTheme.setMatrix(this, false); refreshPreview()
+        }
+    }
+
     private fun setupReset() {
         findViewById<TextView>(R.id.btnReset).setOnClickListener {
             LexTheme.applyModeDefaults(this, true)
@@ -140,6 +178,16 @@ class SettingsActivity : AppCompatActivity() {
         }
         previewBtn.background = btnBg
         previewBtn.setTextColor(contrastOn(accent))
+
+        // Applique la police choisie a l'apercu
+        val tf = LexTheme.typeface(this)
+        previewText.typeface = tf
+        previewBtn.typeface = tf
+
+        // Marque les boutons Matrix actif/inactif
+        val on = LexTheme.matrixOn(this)
+        findViewById<TextView>(R.id.btnMatrixOn)?.alpha = if (on) 1f else 0.4f
+        findViewById<TextView>(R.id.btnMatrixOff)?.alpha = if (on) 0.4f else 1f
     }
 
     // Met la couleur de texte sur les TextView "normaux" (pas les pastilles ni boutons colores)

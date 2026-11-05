@@ -49,6 +49,26 @@ object AppRepository {
         return FAVORITE_PACKAGES.mapNotNull { byPkg[it] }
     }
 
+    // Apps "officielles" a montrer sur la page d'accueil : les apps du dock
+    // resolues en vraies apps (telephone, contacts, messages, photo, navigateur...).
+    fun officialApps(context: Context): List<AppInfo> {
+        val roles = listOf("dialer", "sms", "camera", "browser", "settings")
+        val out = ArrayList<AppInfo>()
+        for (r in roles) resolveDock(context, r)?.let { out.add(it) }
+        // Ajoute contacts si disponible
+        val pm = context.packageManager
+        val contacts = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+            data = android.net.Uri.parse("content://contacts/people/")
+        }
+        val ri = pm.resolveActivity(contacts, 0)
+        if (ri?.activityInfo != null) {
+            try {
+                out.add(AppInfo(ri.loadLabel(pm).toString(), ri.activityInfo.packageName, ri.loadIcon(pm)))
+            } catch (_: Exception) {}
+        }
+        return out.distinctBy { it.packageName }
+    }
+
     // Resout un role de la barre d'accueil (telephone, camera...) vers une vraie app.
     fun resolveDock(context: Context, role: String): AppInfo? {
         val pm = context.packageManager
