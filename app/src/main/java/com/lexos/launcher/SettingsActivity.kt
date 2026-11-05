@@ -59,6 +59,7 @@ class SettingsActivity : AppCompatActivity() {
         }
         setupWallpaper()
         setupFontRow()
+        setupClockStyle()
         setupMatrix()
         setupReset()
 
@@ -136,6 +137,15 @@ class SettingsActivity : AppCompatActivity() {
             tv.setBackgroundResource(R.drawable.tile_app)
             tv.setOnClickListener { LexTheme.setFont(this, key); refreshPreview() }
             row.addView(tv)
+        }
+    }
+
+    private fun setupClockStyle() {
+        findViewById<TextView>(R.id.btnClockNum).setOnClickListener {
+            LexTheme.setClockStyle(this, "num")
+        }
+        findViewById<TextView>(R.id.btnClockAnalog).setOnClickListener {
+            LexTheme.setClockStyle(this, "aiguille")
         }
     }
 

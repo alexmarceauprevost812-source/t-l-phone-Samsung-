@@ -136,6 +136,15 @@ object LexTheme {
         prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
     }
 
+    // Style d'horloge : "num" (numerique) ou "aiguille" (analogique). null = pas encore choisi.
+    private const val K_CLOCK = "clock_style"
+
+    fun clockStyle(ctx: Context): String? = prefs(ctx).getString(K_CLOCK, null)
+
+    fun setClockStyle(ctx: Context, style: String) {
+        prefs(ctx).edit().putString(K_CLOCK, style).apply()
+    }
+
     // Une seule app rapide, lancee par "glisser vers la gauche"
     private const val K_LEFTAPP = "left_app"
 

@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         // Page d'accueil = seulement les apps choisies (ou les apps de base si rien de choisi)
         setupPager(homeApps(), favorites)
         setupDrawer(allApps)
+        askClockStyleIfFirstRun()
         setupDock()
         setupSwipeDown()
         setupInsets()
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         // Redessine les grilles pour appliquer police/couleur aux noms d'apps
         refreshFavorites()
         findViewById<RecyclerView>(R.id.appsGrid).adapter?.notifyDataSetChanged()
+        applyClockStyle()
         handler.post(clockTick)
         updateHomeWeather()
         updateNotifRow()
@@ -88,6 +90,31 @@ class MainActivity : AppCompatActivity() {
     private fun updateClock() {
         clock.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         dateView.text = SimpleDateFormat("EEEE d MMMM", Locale.getDefault()).format(Date())
+    }
+
+    // Applique le style d'horloge choisi (numerique ou aiguilles)
+    private fun applyClockStyle() {
+        val analog = findViewById<AnalogClockView>(R.id.clockAnalog)
+        val numeric = LexTheme.clockStyle(this) != "aiguille"
+        clock.visibility = if (numeric) View.VISIBLE else View.GONE
+        analog.visibility = if (numeric) View.GONE else View.VISIBLE
+        analog.setAccent(LexTheme.accent(this))
+    }
+
+    // Au tout premier lancement : demande numerique ou aiguilles
+    private fun askClockStyleIfFirstRun() {
+        if (LexTheme.clockStyle(this) != null) return
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.LexDialog)
+            .setTitle("Bienvenue sur LexOS ⚡")
+            .setMessage("Quelle horloge veux-tu ?")
+            .setCancelable(false)
+            .setPositiveButton("Numérique 03:45") { _, _ ->
+                LexTheme.setClockStyle(this, "num"); applyClockStyle()
+            }
+            .setNegativeButton("À aiguilles 🕐") { _, _ ->
+                LexTheme.setClockStyle(this, "aiguille"); applyClockStyle()
+            }
+            .show()
     }
 
     // Rangee des notifications sur l'accueil : icones des apps qui en ont.

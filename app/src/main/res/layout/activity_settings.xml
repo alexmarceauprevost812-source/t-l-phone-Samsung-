@@ -141,6 +141,33 @@
             android:orientation="vertical"
             android:layout_marginTop="10dp" />
 
+        <!-- STYLE D'HORLOGE -->
+        <TextView
+            android:id="@+id/lblClock"
+            style="@style/SettingLabel"
+            android:text="HORLOGE" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/btnClockNum"
+                style="@style/ModeButton"
+                android:text="Numérique" />
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="1dp" />
+
+            <TextView
+                android:id="@+id/btnClockAnalog"
+                style="@style/ModeButton"
+                android:text="À aiguilles" />
+        </LinearLayout>
+
         <!-- EFFET MATRIX -->
         <TextView
             android:id="@+id/lblMatrix"

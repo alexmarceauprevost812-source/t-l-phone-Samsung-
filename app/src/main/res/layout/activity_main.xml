@@ -21,15 +21,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- En-tete (horloge + date) : zone pour glisser vers le bas -->
+        <!-- HAUT (~30% hauteur) : horloge, date, onglets. Zone pour glisser. -->
         <LinearLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="30"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingTop="40dp"
-            android:paddingBottom="16dp">
+            android:gravity="center"
+            android:paddingTop="24dp">
 
             <TextView
                 android:id="@+id/clock"
@@ -37,50 +37,20 @@
                 android:layout_height="wrap_content"
                 android:text="00:00"
                 android:textColor="@color/white"
-                android:textSize="78sp" />
+                android:textSize="72sp" />
+
+            <com.lexos.launcher.AnalogClockView
+                android:id="@+id/clockAnalog"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/lexos_orange"
-                android:textSize="12sp" />
-
-            <!-- Carte meteo + notifications, en gros -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:orientation="vertical"
-                android:background="@drawable/tile_app"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/homeWeather"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="…"
-                    android:textColor="@color/white"
-                    android:textSize="30sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="12dp"
-                    android:background="#22FFFFFF" />
-
-                <LinearLayout
-                    android:id="@+id/notifRow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical" />
-            </LinearLayout>
+                android:textSize="13sp" />
 
             <!-- Onglets Accueil / Favoris -->
             <LinearLayout
@@ -118,12 +88,82 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 2 pages : accueil (apps officielles) + favoris gros plan -->
+        <!-- MILIEU (~30% hauteur) : meteo a GAUCHE 50% + notifications a DROITE 50% -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="30"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp">
+
+            <!-- Meteo -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/tile_app"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MÉTÉO"
+                    android:textColor="@color/lexos_grey_dim"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.1" />
+
+                <TextView
+                    android:id="@+id/homeWeather"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="…"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+            </LinearLayout>
+
+            <!-- Notifications -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/tile_app"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NOTIFICATIONS"
+                    android:textColor="@color/lexos_grey_dim"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.1" />
+
+                <LinearLayout
+                    android:id="@+id/notifRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- BAS (~40%) : apps selectionnees (on voit ~1 rangee et demie, puis on scrolle) -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="40" />
 
         <!-- Barre d'accueil defilante (gauche-droite) -->
         <HorizontalScrollView
