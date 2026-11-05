@@ -47,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="favori · gros plan"
+        android:text="favori · glisse ↑↓"
         android:textColor="@color/lexos_orange"
         android:textSize="12sp" />
 

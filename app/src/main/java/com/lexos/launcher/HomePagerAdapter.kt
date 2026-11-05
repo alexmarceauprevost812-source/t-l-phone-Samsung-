@@ -42,6 +42,8 @@ class HomePagerAdapter(
         } else {
             val ctx = holder.itemView.context
             val fav = holder.itemView.findViewById<ViewPager2>(R.id.favPager)
+            // Defilement vertical pour ne pas entrer en conflit avec le swipe horizontal des pages
+            fav.orientation = ViewPager2.ORIENTATION_VERTICAL
             fav.adapter = FavoritesAdapter(favorites) { app, icon -> onOpen(app, icon) }
 
             // Meteo (coordonnees par defaut, pas besoin de permission)
