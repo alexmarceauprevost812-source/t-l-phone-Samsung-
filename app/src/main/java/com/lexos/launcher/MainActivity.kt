@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clock: TextView
     private lateinit var dateView: TextView
     private lateinit var matrix: MatrixView
+    private var allApps: List<AppInfo> = emptyList()
     private val handler = Handler(Looper.getMainLooper())
 
     private val clockTick = object : Runnable {
@@ -53,12 +54,12 @@ class MainActivity : AppCompatActivity() {
         dateView = findViewById(R.id.date)
         matrix = findViewById(R.id.matrix)
 
-        val all = AppRepository.loadAll(this)
-        val favorites = AppRepository.favorites(all).ifEmpty { all.take(3) }
+        allApps = AppRepository.loadAll(this)
+        val favorites = AppRepository.userFavorites(this, allApps).ifEmpty { allApps.take(3) }
 
         // Page d'accueil = toutes les apps
-        setupPager(all, favorites)
-        setupDrawer(all)
+        setupPager(allApps, favorites)
+        setupDrawer(allApps)
         setupDock()
         setupSwipeDown()
         setupInsets()
@@ -110,21 +111,44 @@ class MainActivity : AppCompatActivity() {
         clock.setTextColor(LexTheme.textColor(this))
     }
 
-    private fun setupPager(official: List<AppInfo>, favorites: List<AppInfo>) {
+    private fun setupPager(homeApps: List<AppInfo>, favorites: List<AppInfo>) {
         val pager = findViewById<ViewPager2>(R.id.pager)
-        pager.adapter = HomePagerAdapter(official, favorites) { app, icon ->
-            LaunchAnim.openWithAnimation(this, icon, app.packageName)
-        }
+        pager.adapter = HomePagerAdapter(
+            homeApps, favorites,
+            onOpen = { app, icon -> LaunchAnim.openWithAnimation(this, icon, app.packageName) },
+            onLongClick = { app -> showFavoriteDialog(app) }
+        )
+    }
+
+    // Appui long sur une app = ajouter / retirer des favoris
+    private fun showFavoriteDialog(app: AppInfo) {
+        val isFav = LexTheme.isFavorite(this, app.packageName)
+        val action = if (isFav) "Retirer des favoris" else "Ajouter aux favoris"
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(app.label)
+            .setItems(arrayOf(action, "Annuler")) { _, which ->
+                if (which == 0) {
+                    if (isFav) LexTheme.removeFavorite(this, app.packageName)
+                    else LexTheme.addFavorite(this, app.packageName)
+                    refreshFavorites()
+                }
+            }
+            .show()
+    }
+
+    private fun refreshFavorites() {
+        val favorites = AppRepository.userFavorites(this, allApps).ifEmpty { allApps.take(3) }
+        setupPager(allApps, favorites)
     }
 
     private fun setupDrawer(all: List<AppInfo>) {
         val drawer = findViewById<NestedScrollView>(R.id.drawer)
         val grid = findViewById<RecyclerView>(R.id.appsGrid)
         grid.layoutManager = GridLayoutManager(this, 4)
-        grid.adapter = AppsAdapter(all) { app, icon ->
+        grid.adapter = AppsAdapter(all, { app, icon ->
             LaunchAnim.openWithAnimation(this, icon, app.packageName)
             sheet.state = BottomSheetBehavior.STATE_HIDDEN
-        }
+        }, { app -> showFavoriteDialog(app) })
         sheet = BottomSheetBehavior.from(drawer)
         sheet.isHideable = true
         sheet.peekHeight = 0

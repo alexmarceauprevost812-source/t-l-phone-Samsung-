@@ -11,7 +11,8 @@ import androidx.viewpager2.widget.ViewPager2
 class HomePagerAdapter(
     private val official: List<AppInfo>,
     private val favorites: List<AppInfo>,
-    private val onOpen: (AppInfo, View) -> Unit
+    private val onOpen: (AppInfo, View) -> Unit,
+    private val onLongClick: ((AppInfo) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class PageVH(view: View) : RecyclerView.ViewHolder(view)
@@ -33,7 +34,7 @@ class HomePagerAdapter(
         if (position == 0) {
             val grid = holder.itemView.findViewById<RecyclerView>(R.id.homeGrid)
             grid.layoutManager = GridLayoutManager(holder.itemView.context, 4)
-            grid.adapter = AppsAdapter(official) { app, icon -> onOpen(app, icon) }
+            grid.adapter = AppsAdapter(official, { app, icon -> onOpen(app, icon) }, onLongClick)
         } else {
             val fav = holder.itemView.findViewById<ViewPager2>(R.id.favPager)
             fav.adapter = FavoritesAdapter(favorites) { app, icon -> onOpen(app, icon) }

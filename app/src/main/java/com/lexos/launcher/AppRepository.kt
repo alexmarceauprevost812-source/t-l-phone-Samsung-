@@ -49,6 +49,13 @@ object AppRepository {
         return FAVORITE_PACKAGES.mapNotNull { byPkg[it] }
     }
 
+    // Favoris choisis par l'utilisateur (via appui long). Priorite sur la liste par defaut.
+    fun userFavorites(context: Context, all: List<AppInfo>): List<AppInfo> {
+        val byPkg = all.associateBy { it.packageName }
+        val chosen = LexTheme.favoritePackages(context).mapNotNull { byPkg[it] }
+        return chosen.ifEmpty { favorites(all) }
+    }
+
     // Apps "officielles" a montrer sur la page d'accueil : les apps du dock
     // resolues en vraies apps (telephone, contacts, messages, photo, navigateur...).
     fun officialApps(context: Context): List<AppInfo> {

@@ -113,6 +113,29 @@ object LexTheme {
         prefs(ctx).edit().putBoolean(K_MATRIX, on).apply()
     }
 
+    // Favoris choisis par l'utilisateur (noms de paquets, dans l'ordre d'ajout)
+    private const val K_FAVS = "favs"
+
+    fun favoritePackages(ctx: Context): List<String> {
+        val raw = prefs(ctx).getString(K_FAVS, "") ?: ""
+        return raw.split(",").filter { it.isNotBlank() }
+    }
+
+    fun isFavorite(ctx: Context, pkg: String): Boolean =
+        favoritePackages(ctx).contains(pkg)
+
+    fun addFavorite(ctx: Context, pkg: String) {
+        val list = favoritePackages(ctx).toMutableList()
+        if (!list.contains(pkg)) list.add(pkg)
+        prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
+    }
+
+    fun removeFavorite(ctx: Context, pkg: String) {
+        val list = favoritePackages(ctx).toMutableList()
+        list.remove(pkg)
+        prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
+    }
+
     // Remet le mode jour ou soir avec ses couleurs par defaut (efface les choix manuels)
     fun applyModeDefaults(ctx: Context, soir: Boolean) {
         setMode(ctx, soir)
