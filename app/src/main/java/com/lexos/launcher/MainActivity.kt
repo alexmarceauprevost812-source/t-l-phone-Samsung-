@@ -18,6 +18,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -59,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         setupDrawer(all)
         setupDock()
         setupSwipeDown()
+        setupInsets()
     }
 
     override fun onResume() {
@@ -165,6 +168,25 @@ class MainActivity : AppCompatActivity() {
         val header = findViewById<View>(R.id.header)
         header.setOnTouchListener { _, ev -> detector.onTouchEvent(ev); true }
     }
+
+    // Remonte le dock au-dessus de la barre de navigation, et descend l'en-tete
+    // sous la barre d'etat, pour que rien ne soit coupe.
+    private fun setupInsets() {
+        val dock = findViewById<LinearLayout>(R.id.dock)
+        ViewCompat.setOnApplyWindowInsetsListener(dock) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, dp(14), v.paddingRight, dp(18) + bars.bottom)
+            insets
+        }
+        val header = findViewById<View>(R.id.header)
+        ViewCompat.setOnApplyWindowInsetsListener(header) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, dp(16) + bars.top, v.paddingRight, v.paddingBottom)
+            insets
+        }
+    }
+
+    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
     private fun colorToHex(c: Int): String =
         String.format("#%06X", 0xFFFFFF and c)
