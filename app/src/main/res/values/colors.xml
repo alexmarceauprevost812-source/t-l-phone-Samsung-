@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="lexos_black">#0A0A0A</color>
+    <color name="lexos_black_soft">#121212</color>
+    <color name="lexos_orange">#FF6A00</color>
+    <color name="lexos_orange_dark">#2A1608</color>
+    <color name="lexos_grey">#CCCCCC</color>
+    <color name="lexos_grey_dim">#888888</color>
+    <color name="white">#FFFFFF</color>
+    <color name="tile_bg">#14FFFFFF</color>
+    <color name="tile_bg_fav">#24FF6A00</color>
+    <color name="drawer_bg">#F50C0C0C</color>
+</resources>

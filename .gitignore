@@ -1,0 +1,17 @@
+# Fichiers de compilation
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# Clés de signature (ne jamais pousser sur GitHub)
+*.jks
+*.keystore

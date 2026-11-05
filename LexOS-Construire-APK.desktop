@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LexOS — Construire l'APK
+Comment=Compile et installe le launcher LexOS sur le téléphone
+Exec=bash -c 'cd "$(dirname "%k")" && ./construire-apk.sh; echo; read -p "Appuie sur Entrée pour fermer..."'
+Terminal=true
+Icon=android
+Categories=Development;
