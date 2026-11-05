@@ -126,11 +126,11 @@ class MainActivity : AppCompatActivity() {
             row.addView(tv)
         } else {
             val byPkg = allApps.associateBy { it.packageName }
-            for (pkg in pkgs.take(5)) {
+            for (pkg in pkgs.take(6)) {
                 val iv = ImageView(this)
-                val size = dp(26)
+                val size = dp(38)
                 val lp = LinearLayout.LayoutParams(size, size)
-                lp.marginEnd = dp(6)
+                lp.marginEnd = dp(10)
                 iv.layoutParams = lp
                 val icon = byPkg[pkg]?.icon ?: try { packageManager.getApplicationIcon(pkg) } catch (_: Exception) { null }
                 iv.setImageDrawable(icon)
@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             if (LexNotifService.count > 0) {
                 val tv = TextView(this)
                 tv.text = "${LexNotifService.count}"
-                tv.textSize = 12f
+                tv.textSize = 18f
                 tv.setTextColor(LexTheme.accent(this))
                 tv.typeface = LexTheme.typeface(this)
                 row.addView(tv)
