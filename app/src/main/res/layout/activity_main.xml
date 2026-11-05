@@ -21,24 +21,40 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Horloge en haut -->
-        <TextView
-            android:id="@+id/clock"
-            android:layout_width="wrap_content"
+        <!-- En-tete (horloge + date) : zone pour glisser vers le bas -->
+        <LinearLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="40dp"
-            android:text="00:00"
-            android:textColor="@color/white"
-            android:textSize="44sp" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="40dp"
+            android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/lexos_orange"
-            android:textSize="12sp" />
+            <TextView
+                android:id="@+id/clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="60sp" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/lexos_orange"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/swipeHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="⌄ glisse ici vers le bas"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <!-- 2 pages : accueil (apps officielles) + favoris gros plan -->
         <androidx.viewpager2.widget.ViewPager2

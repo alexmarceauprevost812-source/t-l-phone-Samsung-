@@ -52,10 +52,10 @@ class MainActivity : AppCompatActivity() {
         matrix = findViewById(R.id.matrix)
 
         val all = AppRepository.loadAll(this)
-        val official = AppRepository.officialApps(this).ifEmpty { all.take(8) }
         val favorites = AppRepository.favorites(all).ifEmpty { all.take(3) }
 
-        setupPager(official, favorites)
+        // Page d'accueil = toutes les apps
+        setupPager(all, favorites)
         setupDrawer(all)
         setupDock()
         setupSwipeDown()
@@ -145,19 +145,25 @@ class MainActivity : AppCompatActivity() {
     // Appui long sur l'horloge = reglages.
     private fun setupSwipeDown() {
         val detector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean = true
             override fun onFling(e1: MotionEvent?, e2: MotionEvent, vx: Float, vy: Float): Boolean {
-                if (e1 != null && e2.y - e1.y > 120 && vy > 0) {
+                if (e1 != null && e2.y - e1.y > 60) {
                     sheet.state = BottomSheetBehavior.STATE_EXPANDED
                     return true
                 }
                 return false
             }
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                // Tap sur l'en-tete = ouvrir toutes les apps (secours si le glissement rate)
+                sheet.state = BottomSheetBehavior.STATE_EXPANDED
+                return true
+            }
             override fun onLongPress(e: MotionEvent) {
                 SettingsActivity.open(this@MainActivity)
             }
         })
-        val top = findViewById<View>(R.id.clock)
-        top.setOnTouchListener { _, ev -> detector.onTouchEvent(ev); true }
+        val header = findViewById<View>(R.id.header)
+        header.setOnTouchListener { _, ev -> detector.onTouchEvent(ev); true }
     }
 
     private fun colorToHex(c: Int): String =
