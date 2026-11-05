@@ -1,12 +1,9 @@
 package com.lexos.launcher
 
-import android.content.Intent
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -40,12 +37,20 @@ class HomePagerAdapter(
             grid.layoutManager = GridLayoutManager(holder.itemView.context, 4)
             grid.adapter = AppsAdapter(official, { app, icon -> onOpen(app, icon) }, onLongClick)
         } else {
-            val ctx = holder.itemView.context
             val fav = holder.itemView.findViewById<ViewPager2>(R.id.favPager)
             fav.orientation = ViewPager2.ORIENTATION_VERTICAL
             fav.adapter = FavoritesAdapter(favorites) { app, icon -> onOpen(app, icon) }
 
-            // Fleches + compteur pour passer d'un favori a l'autre (fiable a 100 %)
+            // Animation fluide (fondu + zoom) quand on change de favori
+            fav.setPageTransformer { page, pos ->
+                page.alpha = 1f - kotlin.math.abs(pos).coerceAtMost(1f)
+                val scale = 0.85f + (1f - kotlin.math.abs(pos).coerceAtMost(1f)) * 0.15f
+                page.scaleX = scale
+                page.scaleY = scale
+                page.translationY = -pos * page.height * 0.12f
+            }
+
+            // Fleches + compteur
             val prev = holder.itemView.findViewById<TextView>(R.id.favPrev)
             val next = holder.itemView.findViewById<TextView>(R.id.favNext)
             val counter = holder.itemView.findViewById<TextView>(R.id.favCounter)
@@ -64,32 +69,6 @@ class HomePagerAdapter(
             val hide = total <= 1
             prev.visibility = if (hide) View.GONE else View.VISIBLE
             next.visibility = if (hide) View.GONE else View.VISIBLE
-
-            // Meteo (coordonnees par defaut, pas besoin de permission)
-            val weather = holder.itemView.findViewById<TextView>(R.id.weatherText)
-            WeatherFetcher.fetch(null, null) { txt ->
-                weather.text = if (txt.isBlank()) "indisponible" else txt
-            }
-
-            // Notifications
-            val notif = holder.itemView.findViewById<TextView>(R.id.notifText)
-            val enabled = NotificationManagerCompat.getEnabledListenerPackages(ctx)
-                .contains(ctx.packageName)
-            if (!enabled) {
-                notif.text = "Activer ▸"
-                notif.setOnClickListener {
-                    try {
-                        val i = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        ctx.startActivity(i)
-                    } catch (_: Exception) {}
-                }
-            } else {
-                val r = LexNotifService.recent
-                notif.setOnClickListener(null)
-                notif.text = if (r.isEmpty()) "Aucune"
-                    else "${LexNotifService.count} • " + r.takeLast(2).joinToString(" · ")
-            }
         }
     }
 }
