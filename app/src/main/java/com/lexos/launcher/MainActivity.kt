@@ -211,11 +211,40 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupPager(homeApps: List<AppInfo>, favorites: List<AppInfo>) {
         val pager = findViewById<ViewPager2>(R.id.pager)
+        val current = pager.currentItem
         pager.adapter = HomePagerAdapter(
             homeApps, favorites,
             onOpen = { app, icon -> LaunchAnim.openWithAnimation(this, icon, app.packageName) },
             onLongClick = { app -> showFavoriteDialog(app) }
         )
+        pager.setCurrentItem(current, false)
+
+        // Onglets Accueil / Favoris : tap pour changer de page (en plus du glissement)
+        val tabHome = findViewById<TextView>(R.id.tabHome)
+        val tabFav = findViewById<TextView>(R.id.tabFav)
+        tabHome.setOnClickListener { pager.setCurrentItem(0, true) }
+        tabFav.setOnClickListener { pager.setCurrentItem(1, true) }
+
+        fun paintTabs(pos: Int) {
+            val on = LexTheme.accent(this)
+            if (pos == 0) {
+                tabHome.setBackgroundResource(R.drawable.logo_circle)
+                tabHome.setTextColor(Color.parseColor("#0A0A0A"))
+                tabFav.background = null
+                tabFav.setTextColor(Color.WHITE)
+            } else {
+                tabFav.setBackgroundResource(R.drawable.logo_circle)
+                tabFav.setTextColor(Color.parseColor("#0A0A0A"))
+                tabHome.background = null
+                tabHome.setTextColor(Color.WHITE)
+            }
+            tabHome.typeface = LexTheme.typeface(this)
+            tabFav.typeface = LexTheme.typeface(this)
+        }
+        paintTabs(current)
+        pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) = paintTabs(position)
+        })
     }
 
     // Appui long sur une app = ajouter / retirer des favoris ou du dock

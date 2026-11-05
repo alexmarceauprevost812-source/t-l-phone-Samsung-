@@ -78,14 +78,40 @@
                     android:paddingBottom="6dp" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/swipeHint"
+            <!-- Onglets Accueil / Favoris -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="⌄ glisse ici vers le bas"
-                android:textColor="#99FFFFFF"
-                android:textSize="11sp" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:background="@drawable/pill_bg"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/tabHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:text="Accueil"
+                    android:textColor="@color/lexos_black"
+                    android:textSize="12sp"
+                    android:background="@drawable/logo_circle" />
+
+                <TextView
+                    android:id="@+id/tabFav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:text="Favoris →"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- 2 pages : accueil (apps officielles) + favoris gros plan -->

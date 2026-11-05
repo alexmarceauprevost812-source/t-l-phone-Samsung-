@@ -65,10 +65,49 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Favoris en gros plan -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/favPager"
+    <!-- Favori en gros plan, avec fleches pour changer -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/favPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/favPrev"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:text="◀"
+            android:textColor="@color/lexos_orange"
+            android:textSize="26sp"
+            android:background="@drawable/dock_circle" />
+
+        <TextView
+            android:id="@+id/favNext"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="▶"
+            android:textColor="@color/lexos_orange"
+            android:textSize="26sp"
+            android:background="@drawable/dock_circle" />
+
+        <TextView
+            android:id="@+id/favCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:text="1 / 1"
+            android:textColor="@color/lexos_grey_dim"
+            android:textSize="12sp" />
+    </FrameLayout>
 </LinearLayout>

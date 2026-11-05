@@ -42,9 +42,28 @@ class HomePagerAdapter(
         } else {
             val ctx = holder.itemView.context
             val fav = holder.itemView.findViewById<ViewPager2>(R.id.favPager)
-            // Defilement vertical pour ne pas entrer en conflit avec le swipe horizontal des pages
             fav.orientation = ViewPager2.ORIENTATION_VERTICAL
             fav.adapter = FavoritesAdapter(favorites) { app, icon -> onOpen(app, icon) }
+
+            // Fleches + compteur pour passer d'un favori a l'autre (fiable a 100 %)
+            val prev = holder.itemView.findViewById<TextView>(R.id.favPrev)
+            val next = holder.itemView.findViewById<TextView>(R.id.favNext)
+            val counter = holder.itemView.findViewById<TextView>(R.id.favCounter)
+            val total = favorites.size
+            fun updateCounter() { counter.text = "${fav.currentItem + 1} / $total" }
+            updateCounter()
+            prev.setOnClickListener {
+                if (total > 0) fav.setCurrentItem((fav.currentItem - 1 + total) % total, true)
+            }
+            next.setOnClickListener {
+                if (total > 0) fav.setCurrentItem((fav.currentItem + 1) % total, true)
+            }
+            fav.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) = updateCounter()
+            })
+            val hide = total <= 1
+            prev.visibility = if (hide) View.GONE else View.VISIBLE
+            next.visibility = if (hide) View.GONE else View.VISIBLE
 
             // Meteo (coordonnees par defaut, pas besoin de permission)
             val weather = holder.itemView.findViewById<TextView>(R.id.weatherText)
