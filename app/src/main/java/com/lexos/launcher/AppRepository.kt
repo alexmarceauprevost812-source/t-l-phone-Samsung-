@@ -85,6 +85,7 @@ object AppRepository {
             "camera" -> Intent("android.media.action.STILL_IMAGE_CAMERA")
             "browser" -> Intent(Intent.ACTION_MAIN).apply { addCategory("android.intent.category.APP_BROWSER") }
             "settings" -> Intent(android.provider.Settings.ACTION_SETTINGS)
+            "contacts" -> Intent(Intent.ACTION_VIEW).apply { data = android.net.Uri.parse("content://contacts/people/") }
             else -> return null
         }
 

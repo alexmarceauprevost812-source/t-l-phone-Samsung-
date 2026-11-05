@@ -136,6 +136,28 @@ object LexTheme {
         prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
     }
 
+    // Apps du dock choisies par l'utilisateur
+    private const val K_DOCK = "dock_apps"
+
+    fun dockPackages(ctx: Context): List<String> {
+        val raw = prefs(ctx).getString(K_DOCK, "") ?: ""
+        return raw.split(",").filter { it.isNotBlank() }
+    }
+
+    fun isInDock(ctx: Context, pkg: String): Boolean = dockPackages(ctx).contains(pkg)
+
+    fun addDock(ctx: Context, pkg: String) {
+        val list = dockPackages(ctx).toMutableList()
+        if (!list.contains(pkg)) list.add(pkg)
+        prefs(ctx).edit().putString(K_DOCK, list.joinToString(",")).apply()
+    }
+
+    fun removeDock(ctx: Context, pkg: String) {
+        val list = dockPackages(ctx).toMutableList()
+        list.remove(pkg)
+        prefs(ctx).edit().putString(K_DOCK, list.joinToString(",")).apply()
+    }
+
     // Remet le mode jour ou soir avec ses couleurs par defaut (efface les choix manuels)
     fun applyModeDefaults(ctx: Context, soir: Boolean) {
         setMode(ctx, soir)

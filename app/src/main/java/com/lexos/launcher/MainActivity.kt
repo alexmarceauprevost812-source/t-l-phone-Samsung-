@@ -120,17 +120,26 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    // Appui long sur une app = ajouter / retirer des favoris
+    // Appui long sur une app = ajouter / retirer des favoris ou du dock
     private fun showFavoriteDialog(app: AppInfo) {
         val isFav = LexTheme.isFavorite(this, app.packageName)
-        val action = if (isFav) "Retirer des favoris" else "Ajouter aux favoris"
+        val inDock = LexTheme.isInDock(this, app.packageName)
+        val favAction = if (isFav) "Retirer des favoris" else "Ajouter aux favoris"
+        val dockAction = if (inDock) "Retirer du dock" else "Ajouter au dock"
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.LexDialog)
             .setTitle(app.label)
-            .setItems(arrayOf(action, "Annuler")) { _, which ->
-                if (which == 0) {
-                    if (isFav) LexTheme.removeFavorite(this, app.packageName)
-                    else LexTheme.addFavorite(this, app.packageName)
-                    refreshFavorites()
+            .setItems(arrayOf(favAction, dockAction, "Annuler")) { _, which ->
+                when (which) {
+                    0 -> {
+                        if (isFav) LexTheme.removeFavorite(this, app.packageName)
+                        else LexTheme.addFavorite(this, app.packageName)
+                        refreshFavorites()
+                    }
+                    1 -> {
+                        if (inDock) LexTheme.removeDock(this, app.packageName)
+                        else LexTheme.addDock(this, app.packageName)
+                        setupDock()
+                    }
                 }
             }
             .show()
@@ -158,14 +167,34 @@ class MainActivity : AppCompatActivity() {
     private fun setupDock() {
         val dock = findViewById<LinearLayout>(R.id.dock)
         dock.removeAllViews()
-        for (role in AppRepository.DOCK_PACKAGES) {
+
+        // 1. Bouton Reglages LexOS
+        val settingsBtn = LayoutInflater.from(this)
+            .inflate(R.layout.item_dock, dock, false) as ImageView
+        settingsBtn.setImageResource(R.drawable.ic_lex_settings)
+        settingsBtn.setOnClickListener { SettingsActivity.open(this) }
+        dock.addView(settingsBtn)
+
+        // 2. Telephone + Contacts
+        for (role in listOf("dialer", "contacts")) {
             val app = AppRepository.resolveDock(this, role) ?: continue
-            val iv = LayoutInflater.from(this)
-                .inflate(R.layout.item_dock, dock, false) as ImageView
-            iv.setImageDrawable(app.icon)
-            iv.setOnClickListener { LaunchAnim.openWithAnimation(this, iv, app.packageName) }
-            dock.addView(iv)
+            addDockIcon(dock, app)
         }
+
+        // 3. Apps choisies par l'utilisateur pour le dock
+        val byPkg = allApps.associateBy { it.packageName }
+        for (pkg in LexTheme.dockPackages(this)) {
+            val app = byPkg[pkg] ?: continue
+            addDockIcon(dock, app)
+        }
+    }
+
+    private fun addDockIcon(dock: LinearLayout, app: AppInfo) {
+        val iv = LayoutInflater.from(this)
+            .inflate(R.layout.item_dock, dock, false) as ImageView
+        iv.setImageDrawable(app.icon)
+        iv.setOnClickListener { LaunchAnim.openWithAnimation(this, iv, app.packageName) }
+        dock.addView(iv)
     }
 
     // Glisser vers le bas sur l'horloge/haut d'ecran = ouvrir toutes les apps.
