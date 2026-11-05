@@ -136,6 +136,17 @@ object LexTheme {
         prefs(ctx).edit().putString(K_FAVS, list.joinToString(",")).apply()
     }
 
+    // App lancee par le geste "glisser vers la gauche" (raccourci rapide)
+    private const val K_LEFTAPP = "left_app"
+
+    fun leftApp(ctx: Context): String? = prefs(ctx).getString(K_LEFTAPP, null)
+
+    fun setLeftApp(ctx: Context, pkg: String?) {
+        val e = prefs(ctx).edit()
+        if (pkg == null) e.remove(K_LEFTAPP) else e.putString(K_LEFTAPP, pkg)
+        e.apply()
+    }
+
     // Apps affichees sur l'ecran d'accueil (choisies par l'utilisateur)
     private const val K_HOME = "home_apps"
 

@@ -340,9 +340,10 @@ class MainActivity : AppCompatActivity() {
         val homeAction = if (onHome) "🏠 Retirer de l'accueil" else "🏠 Ajouter à l'accueil"
         val favAction = if (isFav) "⭐ Retirer des favoris" else "⭐ Ajouter aux favoris"
         val dockAction = if (inDock) "⬇ Retirer du dock" else "⬇ Ajouter au dock"
+        val leftAction = "← Raccourci geste gauche"
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.LexDialog)
             .setTitle(app.label)
-            .setItems(arrayOf(homeAction, favAction, dockAction, "Annuler")) { _, which ->
+            .setItems(arrayOf(homeAction, favAction, dockAction, leftAction, "Annuler")) { _, which ->
                 when (which) {
                     0 -> {
                         if (onHome) LexTheme.removeHome(this, app.packageName)
@@ -358,6 +359,11 @@ class MainActivity : AppCompatActivity() {
                         if (inDock) LexTheme.removeDock(this, app.packageName)
                         else LexTheme.addDock(this, app.packageName)
                         setupDock()
+                    }
+                    3 -> {
+                        LexTheme.setLeftApp(this, app.packageName)
+                        android.widget.Toast.makeText(this,
+                            "${app.label} → glisse vers la gauche", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -430,8 +436,17 @@ class MainActivity : AppCompatActivity() {
         val detector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean = true
             override fun onFling(e1: MotionEvent?, e2: MotionEvent, vx: Float, vy: Float): Boolean {
-                if (e1 != null && e2.y - e1.y > 60) {
+                if (e1 == null) return false
+                val dx = e2.x - e1.x
+                val dy = e2.y - e1.y
+                // Glisser vers le bas = toutes les apps
+                if (dy > 60 && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
                     sheet.state = BottomSheetBehavior.STATE_EXPANDED
+                    return true
+                }
+                // Glisser vers la gauche = app rapide (appareil photo par defaut)
+                if (dx < -120 && kotlin.math.abs(dx) > kotlin.math.abs(dy)) {
+                    launchLeftApp()
                     return true
                 }
                 return false
@@ -467,6 +482,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    // Lance l'app du geste gauche : celle choisie, sinon l'appareil photo.
+    private fun launchLeftApp() {
+        val chosen = LexTheme.leftApp(this)
+        if (chosen != null) {
+            AppRepository.launch(this, chosen)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            return
+        }
+        // Defaut : appareil photo
+        val cam = AppRepository.resolveDock(this, "camera")
+        if (cam != null) {
+            AppRepository.launch(this, cam.packageName)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+    }
 
     private fun colorToHex(c: Int): String =
         String.format("#%06X", 0xFFFFFF and c)
