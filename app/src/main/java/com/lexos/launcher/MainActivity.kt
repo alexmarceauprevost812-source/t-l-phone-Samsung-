@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
     private fun showFavoriteDialog(app: AppInfo) {
         val isFav = LexTheme.isFavorite(this, app.packageName)
         val action = if (isFav) "Retirer des favoris" else "Ajouter aux favoris"
-        androidx.appcompat.app.AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.LexDialog)
             .setTitle(app.label)
             .setItems(arrayOf(action, "Annuler")) { _, which ->
                 if (which == 0) {
